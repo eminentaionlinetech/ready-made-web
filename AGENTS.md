@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Catalog reads go through public server functions in `src/lib/websites.functions.ts` (publishable key, anon SELECT policy) so pages render with data on first load.
+- Purchases are only inserted by trusted server code (service role, e.g. a payment webhook); buyers can only read their own rows.
+- Profile photos live in the private `avatars` bucket under `<userId>/`; display them via short-lived signed links.
