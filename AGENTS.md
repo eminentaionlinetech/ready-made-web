@@ -34,3 +34,4 @@ use the editor.
 - Purchases are only inserted by trusted server code (service role, e.g. a payment webhook); buyers can only read their own rows.
 - Profile photos live in the private `avatars` bucket under `<userId>/`; display them via short-lived signed links.
 - `websites.file_path` is not granted to anon/authenticated (column-level SELECT grants); always select explicit columns, never `*`. Site files live in the private `website-files` bucket, readable only via `public.owns_website_file()` (paid purchase).
+- Paystack checkout: `startCheckout`/`confirmCheckout` in `src/lib/checkout.functions.ts`; only `confirmPayment()` in `src/lib/paystack.server.ts` marks a purchase paid, after re-verifying the reference with Paystack (amount + currency). The webhook at `/api/public/paystack-webhook` treats its body as a hint only. Purchases start `pending`; buyer-facing reads filter `status = 'paid'`.
