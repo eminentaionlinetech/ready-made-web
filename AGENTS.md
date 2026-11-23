@@ -33,3 +33,4 @@ use the editor.
 - Catalog reads go through public server functions in `src/lib/websites.functions.ts` (publishable key, anon SELECT policy) so pages render with data on first load.
 - Purchases are only inserted by trusted server code (service role, e.g. a payment webhook); buyers can only read their own rows.
 - Profile photos live in the private `avatars` bucket under `<userId>/`; display them via short-lived signed links.
+- `websites.file_path` is not granted to anon/authenticated (column-level SELECT grants); always select explicit columns, never `*`. Site files live in the private `website-files` bucket, readable only via `public.owns_website_file()` (paid purchase).

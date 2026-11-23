@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import type { Website } from "./catalog";
 
 const COLUMNS =
-  "id, slug, title, tagline, description, category, price_cents, demo_url, image_url, features, page_count";
+  "id, slug, title, tagline, description, category, price_cents, demo_url, image_url, screenshots, features, page_count";
 
 // Public catalog reads: publishable key + "anyone can browse" policy, no session.
 function publicClient() {

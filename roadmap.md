@@ -5,5 +5,6 @@
 - [x] Sign-in page (email, Google, Lovable)
 - [x] Buyer dashboard listing purchases
 - [x] Buyer profile with name and photo
+- [x] Websites table: screenshots and file path; private website-files storage for buyers
 - [ ] Paddle checkout wired to Buy button (blocked: needs a paid Lovable plan)
 - [ ] Real listings and live demo links (waiting on user; samples use example.com demos)

@@ -11,6 +11,7 @@ export type Website = Pick<
   | "price_cents"
   | "demo_url"
   | "image_url"
+  | "screenshots"
   | "features"
   | "page_count"
 >;

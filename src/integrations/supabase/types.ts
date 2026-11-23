@@ -80,10 +80,12 @@ export type Database = {
           demo_url: string
           description: string
           features: string[]
+          file_path: string | null
           id: string
           image_url: string
           page_count: number
           price_cents: number
+          screenshots: string[]
           slug: string
           tagline: string
           title: string
@@ -94,10 +96,12 @@ export type Database = {
           demo_url: string
           description: string
           features?: string[]
+          file_path?: string | null
           id?: string
           image_url: string
           page_count?: number
           price_cents: number
+          screenshots?: string[]
           slug: string
           tagline: string
           title: string
@@ -108,10 +112,12 @@ export type Database = {
           demo_url?: string
           description?: string
           features?: string[]
+          file_path?: string | null
           id?: string
           image_url?: string
           page_count?: number
           price_cents?: number
+          screenshots?: string[]
           slug?: string
           tagline?: string
           title?: string
@@ -123,7 +129,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      owns_website_file: { Args: { _path: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
