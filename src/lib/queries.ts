@@ -33,6 +33,7 @@ export const purchasesQuery = (userId: string) =>
           "id, amount_cents, status, created_at, website:websites(slug, title, tagline, image_url, demo_url, category)",
         )
         .eq("user_id", userId)
+        .eq("status", "paid")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];

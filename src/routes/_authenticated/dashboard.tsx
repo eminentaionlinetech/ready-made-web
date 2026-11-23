@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Camera, ExternalLink, Package } from "lucide-react";
@@ -12,8 +13,19 @@ import { initials } from "@/components/site-header";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/catalog";
 import { avatarUrlQuery, profileQuery, purchasesQuery } from "@/lib/queries";
+import { confirmCheckout } from "@/lib/checkout.functions";
+
+// Paystack sends buyers back here with ?reference=… (and trxref) after paying.
+type DashboardSearch = { reference?: string; checkout?: string };
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  validateSearch: (search: Record<string, unknown>): DashboardSearch => {
+    const ref = search["reference"] ?? search["trxref"];
+    const out: DashboardSearch = {};
+    if (typeof ref === "string" && ref) out.reference = ref;
+    if (typeof search["checkout"] === "string") out.checkout = search["checkout"];
+    return out;
+  },
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(profileQuery(context.user.id)),
@@ -40,6 +52,7 @@ function Dashboard() {
   const { data: purchases } = useSuspenseQuery(purchasesQuery(user.id));
   const total = purchases.reduce((sum, p) => sum + p.amount_cents, 0);
   const firstName = (profile?.display_name || "").split(" ")[0];
+  const confirming = usePaymentReturn(user.id);
 
   return (
     <div className="mx-auto max-w-6xl px-5 pt-12">
@@ -47,6 +60,11 @@ function Dashboard() {
         {firstName ? `Hi, ${firstName}` : "Your dashboard"}
       </h1>
       <p className="mt-2 text-muted-foreground">Your websites and account, all in one place.</p>
+      {confirming ? (
+        <div className="mt-6 flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm">
+          <span className="size-2 animate-pulse rounded-full bg-highlight" /> Confirming your payment…
+        </div>
+      ) : null}
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_340px]">
         <section>
@@ -224,4 +242,37 @@ function ProfileCard({
       </form>
     </aside>
   );
+}
+
+function usePaymentReturn(userId: string) {
+  const { reference } = Route.useSearch();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const confirm = useServerFn(confirmCheckout);
+  const [confirming, setConfirming] = useState(Boolean(reference));
+  const handled = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!reference || handled.current === reference) return;
+    handled.current = reference;
+    setConfirming(true);
+    confirm({ data: { reference } })
+      .then(async ({ paid }) => {
+        if (paid) {
+          await queryClient.invalidateQueries({ queryKey: ["me", "purchases", userId] });
+          toast.success("Payment received", { description: "Your new website is ready below." });
+        } else {
+          toast("Payment not completed", {
+            description: "We haven't received this payment yet. If you paid, it will appear here shortly.",
+          });
+        }
+      })
+      .catch(() => toast.error("Couldn't check your payment", { description: "Please refresh in a moment." }))
+      .finally(() => {
+        setConfirming(false);
+        navigate({ to: "/dashboard", search: {}, replace: true });
+      });
+  }, [reference, confirm, navigate, queryClient, userId]);
+
+  return confirming;
 }

@@ -17,9 +17,10 @@ export type Website = Pick<
 >;
 
 export function formatPrice(cents: number): string {
-  return new Intl.NumberFormat("en-US", {
+  // Prices are stored in kobo (1/100 naira).
+  return new Intl.NumberFormat("en-NG", {
     style: "currency",
-    currency: "USD",
+    currency: "NGN",
     minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
   }).format(cents / 100);
 }

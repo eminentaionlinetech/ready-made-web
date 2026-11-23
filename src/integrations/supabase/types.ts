@@ -42,24 +42,45 @@ export type Database = {
         Row: {
           amount_cents: number
           created_at: string
+          currency: string
           id: string
+          paid_at: string | null
+          paystack_access_code: string | null
+          paystack_authorization_url: string | null
+          paystack_reference: string | null
+          paystack_transaction_id: number | null
           status: string
+          updated_at: string
           user_id: string
           website_id: string
         }
         Insert: {
           amount_cents: number
           created_at?: string
+          currency?: string
           id?: string
+          paid_at?: string | null
+          paystack_access_code?: string | null
+          paystack_authorization_url?: string | null
+          paystack_reference?: string | null
+          paystack_transaction_id?: number | null
           status?: string
+          updated_at?: string
           user_id: string
           website_id: string
         }
         Update: {
           amount_cents?: number
           created_at?: string
+          currency?: string
           id?: string
+          paid_at?: string | null
+          paystack_access_code?: string | null
+          paystack_authorization_url?: string | null
+          paystack_reference?: string | null
+          paystack_transaction_id?: number | null
           status?: string
+          updated_at?: string
           user_id?: string
           website_id?: string
         }

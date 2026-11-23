@@ -29,6 +29,13 @@
       "when": 1795445837499,
       "tag": "0003_add_screenshots_and_file_path",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795446198313,
+      "tag": "0004_paystack_checkout",
+      "breakpoints": true
     }
   ]
 }

@@ -17,8 +17,8 @@ describe("category filter", () => {
 });
 
 describe("prices", () => {
-  it("shows whole-dollar prices without cents", () => {
-    expect(formatPrice(12900)).toBe("$129");
+  it("shows whole-naira prices without kobo", () => {
+    expect(formatPrice(12900000)).toBe("₦129,000");
   });
 });
 

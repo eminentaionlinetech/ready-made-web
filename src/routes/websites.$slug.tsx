@@ -1,12 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Check, ExternalLink, Layers, ShoppingBag } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Check, ExternalLink, Layers, Loader2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BrowserFrame } from "@/components/browser-frame";
 import { useAuth } from "@/lib/auth";
 import { formatPrice } from "@/lib/catalog";
 import { purchasesQuery, websiteQuery } from "@/lib/queries";
+import { startCheckout } from "@/lib/checkout.functions";
 
 export const Route = createFileRoute("/websites/$slug")({
   loader: async ({ context, params }) => {
@@ -50,6 +53,32 @@ function WebsiteDetail() {
   if (!data) return null;
   const website = data;
   const owned = purchases.data?.some((p) => p.website?.slug === website.slug) ?? false;
+  const checkout = useServerFn(startCheckout);
+  const [paying, setPaying] = useState(false);
+
+  async function buy() {
+    setPaying(true);
+    try {
+      const result = await checkout({ data: { slug: website.slug, origin: window.location.origin } });
+      if (result.status === "owned") {
+        await purchases.refetch();
+        setPaying(false);
+        return;
+      }
+      // Paystack's payment page can't open inside the editor preview frame, so use a new tab there.
+      if (window.self !== window.top) {
+        window.open(result.authorizationUrl, "_blank", "noopener");
+        setPaying(false);
+      } else {
+        window.location.assign(result.authorizationUrl);
+      }
+    } catch (err) {
+      setPaying(false);
+      toast.error("Couldn't start checkout", {
+        description: err instanceof Error ? err.message : "Please try again.",
+      });
+    }
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-5 pt-8">
@@ -94,13 +123,11 @@ function WebsiteDetail() {
                 <Button
                   size="lg"
                   className="w-full bg-highlight text-highlight-foreground hover:bg-highlight/90"
-                  onClick={() =>
-                    toast("Checkout is coming soon", {
-                      description: "Payments aren't switched on yet. Please check back shortly.",
-                    })
-                  }
+                  disabled={paying}
+                  onClick={buy}
                 >
-                  <ShoppingBag /> Buy now
+                  {paying ? <Loader2 className="animate-spin" /> : <ShoppingBag />}
+                  {paying ? "Opening checkout…" : "Buy now"}
                 </Button>
               ) : (
                 <Button
