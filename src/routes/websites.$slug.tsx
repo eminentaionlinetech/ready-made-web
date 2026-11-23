@@ -50,8 +50,10 @@ function WebsiteDetail() {
   const { data } = useSuspenseQuery(websiteQuery(slug));
   const { user } = useAuth();
   const purchases = useQuery({ ...purchasesQuery(user?.id ?? ""), enabled: Boolean(user) });
+  const [shown, setShown] = useState(0);
   if (!data) return null;
   const website = data;
+  const gallery = website.screenshots.length ? website.screenshots : [website.image_url];
   const owned = purchases.data?.some((p) => p.website?.slug === website.slug) ?? false;
   const checkout = useServerFn(startCheckout);
   const [paying, setPaying] = useState(false);
@@ -90,13 +92,33 @@ function WebsiteDetail() {
       </Link>
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[1.5fr_1fr]">
-        <BrowserFrame className="shadow-lift" label={`${website.slug}.demo`}>
-          <img
-            src={website.image_url}
-            alt={`${website.title} website preview`}
-            className="aspect-[3/2] w-full object-cover object-top"
-          />
-        </BrowserFrame>
+        <div>
+          <BrowserFrame className="shadow-lift" label={`${website.slug}.demo`}>
+            <img
+              src={gallery[shown] ?? website.image_url}
+              alt={`${website.title} website preview`}
+              className="aspect-[3/2] w-full object-cover object-top"
+            />
+          </BrowserFrame>
+          {gallery.length > 1 ? (
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+              {gallery.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setShown(i)}
+                  aria-label={`Show screenshot ${i + 1}`}
+                  aria-pressed={i === shown}
+                  className={`w-28 shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
+                    i === shown ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <img src={src} alt="" className="aspect-[3/2] w-full object-cover object-top" />
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <span className="inline-flex rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground">

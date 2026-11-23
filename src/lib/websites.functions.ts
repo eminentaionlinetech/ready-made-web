@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { Website } from "./catalog";
+import { withScreenshotLinks } from "./screenshots";
 
 const COLUMNS =
   "id, slug, title, tagline, description, category, price_cents, demo_url, image_url, screenshots, features, page_count";
@@ -28,24 +29,28 @@ function publicClient() {
 
 export const listWebsites = createServerFn({ method: "GET" }).handler(
   async (): Promise<Website[]> => {
-    const { data, error } = await publicClient()
+    const client = publicClient();
+    const { data, error } = await client
       .from("websites")
       .select(COLUMNS)
       .order("created_at", { ascending: true })
       .order("title", { ascending: true });
     if (error) throw new Error(error.message);
-    return data ?? [];
+    return withScreenshotLinks(client, data ?? []);
   },
 );
 
 export const getWebsite = createServerFn({ method: "GET" })
   .inputValidator((input: { slug: string }) => ({ slug: String(input.slug).slice(0, 120) }))
   .handler(async ({ data }): Promise<Website | null> => {
-    const { data: row, error } = await publicClient()
+    const client = publicClient();
+    const { data: row, error } = await client
       .from("websites")
       .select(COLUMNS)
       .eq("slug", data.slug)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return row ?? null;
+    if (!row) return null;
+    const [withLinks] = await withScreenshotLinks(client, [row]);
+    return withLinks ?? row;
   });

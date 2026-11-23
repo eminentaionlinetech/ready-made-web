@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { avatarUrlQuery, profileQuery } from "@/lib/queries";
+import { avatarUrlQuery, isAdminQuery, profileQuery } from "@/lib/queries";
 
 export function initials(name: string | null | undefined, email: string | null | undefined) {
   const source = (name || email || "?").trim();
@@ -26,6 +26,7 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const profile = useQuery({ ...profileQuery(user?.id ?? ""), enabled: Boolean(user) });
   const avatar = useQuery(avatarUrlQuery(profile.data?.avatar_url));
+  const isAdmin = useQuery({ ...isAdminQuery(user?.id ?? ""), enabled: Boolean(user) });
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
@@ -66,6 +67,11 @@ export function SiteHeader() {
                 <DropdownMenuItem onSelect={() => navigate({ to: "/dashboard" })}>
                   <LayoutDashboard /> Dashboard
                 </DropdownMenuItem>
+                {isAdmin.data ? (
+                  <DropdownMenuItem onSelect={() => navigate({ to: "/admin" })}>
+                    <ShieldCheck /> Manage listings
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem
                   onSelect={async () => {
                     await supabase.auth.signOut();

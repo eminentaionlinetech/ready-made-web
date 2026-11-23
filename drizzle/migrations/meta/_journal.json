@@ -36,6 +36,13 @@
       "when": 1795446198313,
       "tag": "0004_paystack_checkout",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795457506031,
+      "tag": "0005_admin_role_and_listing_management",
+      "breakpoints": true
     }
   ]
 }
