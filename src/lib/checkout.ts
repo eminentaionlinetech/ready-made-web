@@ -41,3 +41,8 @@ export function isPaidTransaction(
     tx.currency.toUpperCase() === expected.currency.toUpperCase()
   );
 }
+
+/** Paystack sends the buyer to the thank-you page after paying; it adds ?reference=… itself. */
+export function thankYouUrl(browserOrigin: string, slug: string): string {
+  return `${returnOrigin(browserOrigin)}/thank-you?checkout=${encodeURIComponent(slug)}`;
+}

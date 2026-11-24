@@ -44,3 +44,27 @@ export function safeRedirect(path: unknown, fallback = "/dashboard"): string {
   if (!path.startsWith("/") || path.startsWith("//") || path.startsWith("/\\")) return fallback;
   return path;
 }
+
+type Searchable = Pick<Website, "title" | "category"> &
+  Partial<Pick<Website, "tagline" | "description" | "features">>;
+
+/** Every word typed must appear somewhere in the listing (title, tagline, description, category or features). */
+export function searchWebsites<T extends Searchable>(websites: T[], query: string | undefined): T[] {
+  const words = (query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return websites;
+  return websites.filter((w) => {
+    const text = [w.title, w.tagline, w.description, w.category, ...(w.features ?? [])]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    return words.every((word) => text.includes(word));
+  });
+}
+
+/** The shop grid: category first, then the search words. */
+export function browseWebsites<T extends Searchable>(
+  websites: T[],
+  { category, q }: { category?: string | undefined; q?: string | undefined },
+): T[] {
+  return searchWebsites(filterByCategory(websites, category), q);
+}

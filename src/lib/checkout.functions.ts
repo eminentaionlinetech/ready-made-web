@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { checkoutReference, returnOrigin, SHOP_CURRENCY } from "./checkout";
+import { checkoutReference, SHOP_CURRENCY, thankYouUrl } from "./checkout";
 
 export type StartCheckoutResult =
   | { status: "redirect"; authorizationUrl: string }
@@ -71,7 +71,7 @@ export const startCheckout = createServerFn({ method: "POST" })
         amount: purchase.amount_cents,
         currency: SHOP_CURRENCY,
         reference,
-        callback_url: `${returnOrigin(data.origin)}/dashboard?checkout=${encodeURIComponent(website.slug)}`,
+        callback_url: thankYouUrl(data.origin, website.slug),
         metadata: { purchase_id: purchase.id, website_slug: website.slug },
       },
     });
@@ -95,14 +95,20 @@ export const confirmCheckout = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z.object({ reference: z.string().min(1).max(100).regex(/^[A-Za-z0-9.=-]+$/) }).parse(input),
   )
-  .handler(async ({ data, context }): Promise<{ paid: boolean }> => {
-    // Row rules only return the buyer's own purchases, so others' references are ignored.
-    const { data: own } = await context.supabase
-      .from("purchases")
-      .select("id")
-      .eq("paystack_reference", data.reference)
-      .maybeSingle();
-    if (!own) return { paid: false };
-    const { confirmPayment } = await import("./paystack.server");
-    return confirmPayment(data.reference);
-  });
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{ paid: boolean; purchaseId: string | null; slug: string | null }> => {
+      // Row rules only return the buyer's own purchases, so others' references are ignored.
+      const { data: own } = await context.supabase
+        .from("purchases")
+        .select("id, website:websites(slug)")
+        .eq("paystack_reference", data.reference)
+        .maybeSingle();
+      if (!own) return { paid: false, purchaseId: null, slug: null };
+      const { confirmPayment } = await import("./paystack.server");
+      const { paid } = await confirmPayment(data.reference);
+      return { paid, purchaseId: own.id, slug: own.website?.slug ?? null };
+    },
+  );
