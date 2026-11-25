@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkoutReference, isPaidTransaction, PUBLISHED_URL, returnOrigin } from "@/lib/checkout";
+import { checkoutReference, isPaidTransaction, PUBLISHED_URL, returnOrigin, thankYouUrl } from "@/lib/checkout";
 
 const expected = { amount_cents: 12900000, currency: "NGN" };
 
@@ -32,5 +32,14 @@ describe("return page after paying", () => {
 describe("payment references", () => {
   it("only uses characters Paystack accepts", () => {
     expect(checkoutReference("1b2c-3d4e", 1000)).toMatch(/^[A-Za-z0-9-]+$/);
+  });
+});
+
+describe("thank-you callback", () => {
+  it("returns to the thank-you page with the purchased slug", () => {
+    expect(thankYouUrl(PUBLISHED_URL, "northwind")).toBe(`${PUBLISHED_URL}/thank-you?checkout=northwind`);
+  });
+  it("keeps the callback on the shop and safely encodes the slug", () => {
+    expect(thankYouUrl("https://evil.example", "a&reference=fake")).toBe(`${PUBLISHED_URL}/thank-you?checkout=a%26reference%3Dfake`);
   });
 });

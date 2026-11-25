@@ -11,3 +11,5 @@
 - [x] Buyer dashboard Download button: 10-minute links, paid purchases only
 - [ ] Register the live-site Paystack webhook once the app is published (waiting on publish)
 - [ ] Real listings and live demo links (waiting on user; samples use example.com demos)
+- [ ] Shop polish: search + category filters, loading states, mobile layouts, thank-you page
+- [ ] Recheck paid-only dashboard downloads and 10-minute signed links

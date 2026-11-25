@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterByCategory, formatPrice, safeRedirect } from "@/lib/catalog";
+import { browseWebsites, searchWebsites, filterByCategory, formatPrice, safeRedirect } from "@/lib/catalog";
 
 const items = [
   { category: "SaaS", slug: "a" },
@@ -27,5 +27,26 @@ describe("after sign-in redirect", () => {
     expect(safeRedirect("//evil.example")).toBe("/dashboard");
     expect(safeRedirect("https://evil.example")).toBe("/dashboard");
     expect(safeRedirect("/websites/northwind")).toBe("/websites/northwind");
+  });
+});
+
+const searchable = [
+  { title: "Northwind", category: "SaaS", tagline: "A launch-ready landing page", description: "For software teams" },
+  { title: "Atelier", category: "Portfolio", tagline: "A designer portfolio", description: "Creative work" },
+];
+describe("shop search", () => {
+  it("finds title matches regardless of case and surrounding spaces", () => {
+    expect(searchWebsites(searchable, "  NORTHWIND  ").map((w) => w.title)).toEqual(["Northwind"]);
+  });
+  it("searches descriptions and requires all search words", () => {
+    expect(searchWebsites(searchable, "software landing").map((w) => w.title)).toEqual(["Northwind"]);
+    expect(searchWebsites(searchable, "software designer")).toEqual([]);
+  });
+  it("combines category and search rather than resetting either", () => {
+    expect(browseWebsites(searchable, { category: "Portfolio", q: "Northwind" })).toEqual([]);
+    expect(browseWebsites(searchable, { category: "SaaS", q: "Northwind" })).toHaveLength(1);
+  });
+  it("returns every listing when the query is blank", () => {
+    expect(searchWebsites(searchable, "   ")).toHaveLength(2);
   });
 });

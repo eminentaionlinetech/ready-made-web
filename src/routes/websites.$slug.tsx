@@ -128,7 +128,7 @@ function WebsiteDetail() {
           <p className="mt-3 text-lg text-muted-foreground">{website.tagline}</p>
 
           <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-card">
-            <div className="flex items-baseline justify-between">
+            <div className="grid min-w-0 gap-2">
               <span className="font-display text-4xl font-semibold">
                 {formatPrice(website.price_cents)}
               </span>

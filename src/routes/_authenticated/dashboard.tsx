@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Camera, Download, ExternalLink, Loader2, Package } from "lucide-react";
+import { Camera, ExternalLink, Package } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,9 @@ import { initials } from "@/components/site-header";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/catalog";
 import { avatarUrlQuery, profileQuery, purchasesQuery } from "@/lib/queries";
-import { confirmCheckout } from "@/lib/checkout.functions";
+
 import { canDownload } from "@/lib/downloads";
-import { getDownloadLink } from "@/lib/downloads.functions";
+import { DownloadButton } from "@/components/download-button";
 
 // Paystack sends buyers back here with ?reference=… (and trxref) after paying.
 type DashboardSearch = { reference?: string; checkout?: string };
@@ -70,7 +69,7 @@ function Dashboard() {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_340px]">
         <section>
-          <div className="flex items-end justify-between border-b border-border pb-4">
+          <div className="grid min-w-0 gap-2 border-b sm:flex sm:items-end sm:justify-between border-border pb-4">
             <h2 className="text-2xl font-semibold">Your websites</h2>
             <span className="text-sm text-muted-foreground">
               {purchases.length} owned · {formatPrice(total)} spent
@@ -110,7 +109,7 @@ function Dashboard() {
                     </div>
                   </div>
                   {p.website ? (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button asChild variant="outline" size="sm">
                         <Link to="/websites/$slug" params={{ slug: p.website.slug }}>
                           Details
@@ -138,37 +137,6 @@ function Dashboard() {
         />
       </div>
     </div>
-  );
-}
-
-function DownloadButton({ purchaseId, title }: { purchaseId: string; title: string }) {
-  const fetchLink = useServerFn(getDownloadLink);
-  const [busy, setBusy] = useState(false);
-
-  async function onClick() {
-    setBusy(true);
-    try {
-      // A fresh 10-minute link each time; the file saves without leaving this page.
-      const { url } = await fetchLink({ data: { purchaseId } });
-      const a = document.createElement("a");
-      a.href = url;
-      a.rel = "noopener";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (e) {
-      toast.error("Couldn't start the download", {
-        description: e instanceof Error ? e.message : "Please try again.",
-      });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Button size="sm" onClick={onClick} disabled={busy} aria-label={`Download ${title}`}>
-      {busy ? <Loader2 className="animate-spin" /> : <Download />} Download
-    </Button>
   );
 }
 
@@ -278,35 +246,11 @@ function ProfileCard({
   );
 }
 
-function usePaymentReturn(userId: string) {
-  const { reference } = Route.useSearch();
+function usePaymentReturn(_userId: string) {
+  const { reference, checkout } = Route.useSearch();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const confirm = useServerFn(confirmCheckout);
-  const [confirming, setConfirming] = useState(Boolean(reference));
-  const handled = useRef<string | null>(null);
-
   useEffect(() => {
-    if (!reference || handled.current === reference) return;
-    handled.current = reference;
-    setConfirming(true);
-    confirm({ data: { reference } })
-      .then(async ({ paid }) => {
-        if (paid) {
-          await queryClient.invalidateQueries({ queryKey: ["me", "purchases", userId] });
-          toast.success("Payment received", { description: "Your new website is ready below." });
-        } else {
-          toast("Payment not completed", {
-            description: "We haven't received this payment yet. If you paid, it will appear here shortly.",
-          });
-        }
-      })
-      .catch(() => toast.error("Couldn't check your payment", { description: "Please refresh in a moment." }))
-      .finally(() => {
-        setConfirming(false);
-        navigate({ to: "/dashboard", search: {}, replace: true });
-      });
-  }, [reference, confirm, navigate, queryClient, userId]);
-
-  return confirming;
+    if (reference) void navigate({ to: "/thank-you", search: { reference, ...(checkout ? { checkout } : {}) }, replace: true });
+  }, [reference, checkout, navigate]);
+  return Boolean(reference);
 }

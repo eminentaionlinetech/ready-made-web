@@ -20,7 +20,7 @@ export function WebsiteCard({ website }: { website: Website }) {
           />
         </div>
       </BrowserFrame>
-      <div className="flex items-start justify-between gap-4 px-1 pb-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 px-1 pb-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="truncate text-lg font-semibold">{website.title}</h3>
@@ -31,7 +31,7 @@ export function WebsiteCard({ website }: { website: Website }) {
             {website.category}
           </span>
         </div>
-        <span className="font-display text-lg font-semibold">{formatPrice(website.price_cents)}</span>
+        <span className="shrink-0 whitespace-nowrap font-display text-base font-semibold sm:text-lg">{formatPrice(website.price_cents)}</span>
       </div>
     </Link>
   );

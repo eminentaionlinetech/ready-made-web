@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { PageLoading } from "@/components/page-loading";
 import { SiteFooter, SiteHeader } from "@/components/site-header";
 import { AuthProvider } from "@/lib/auth";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -104,6 +105,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
+  pendingComponent: PageLoading,
+  pendingMs: 200,
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
