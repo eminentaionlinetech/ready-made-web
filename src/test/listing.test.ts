@@ -3,11 +3,11 @@ import { nairaToKobo, slugify, validateListing, type ListingDraft } from "@/lib/
 import { isStoredPath } from "@/lib/screenshots";
 
 const complete: ListingDraft = {
-  title: "Northwind",
-  slug: "northwind",
+  title: "Test Website",
+  slug: "test-website",
   category: "SaaS",
   price: "129000",
-  demoUrl: "https://northwind-demo.com",
+  demoUrl: "https://test-website-demo.com",
   description: "A landing page.",
   screenshotCount: 1,
   hasZip: true,
@@ -45,14 +45,14 @@ describe("admin listing requirements", () => {
 
 describe("listing web addresses", () => {
   it("turns titles into clean addresses", () => {
-    expect(slugify("Kiln & Co.")).toBe("kiln-and-co");
+    expect(slugify("Test & Company")).toBe("test-and-company");
   });
 });
 
 describe("screenshot storage", () => {
-  it("treats uploaded files as private paths and samples as site images", () => {
+  it("treats uploaded files as private paths and site images as non-storage paths", () => {
     expect(isStoredPath("3f2a/1700-0-home.png")).toBe(true);
-    expect(isStoredPath("/screens/northwind.jpg")).toBe(false);
+    expect(isStoredPath("/assets/test-image.jpg")).toBe(false);
     expect(isStoredPath("https://cdn.example.com/a.png")).toBe(false);
   });
 });

@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { WebsiteCard } from "@/components/website-card";
-import { categoriesFrom, browseWebsites } from "@/lib/catalog";
+import { categoriesFrom, browseWebsites, catalogAvailability } from "@/lib/catalog";
 import { websitesQuery } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { Package, Search, X } from "lucide-react";
 
 type HomeSearch = { category?: string; q?: string };
 
@@ -42,16 +42,19 @@ function Home() {
   const { category, q } = Route.useSearch();
   const navigate = useNavigate({ from: "/" });
   const { data: websites } = useSuspenseQuery(websitesQuery());
+  const { count, showBadge, isEmpty } = catalogAvailability(websites);
   const categories = categoriesFrom(websites);
   const visible = browseWebsites(websites, { category, q });
 
   return (
     <div className="mx-auto max-w-6xl px-5">
       <section className="pb-8 pt-8 sm:pb-12 sm:pt-20">
-        <p className="inline-flex items-center gap-2 rounded-full bg-highlight-soft px-3 py-1 text-xs font-medium">
-          <span className="size-1.5 rounded-full bg-highlight" />
-          {websites.length} websites ready to launch
-        </p>
+        {showBadge ? (
+          <p className="inline-flex items-center gap-2 rounded-full bg-highlight-soft px-3 py-1 text-xs font-medium">
+            <span className="size-1.5 rounded-full bg-highlight" />
+            {count} {count === 1 ? "website" : "websites"} ready to launch
+          </p>
+        ) : null}
         <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-tight sm:text-7xl">
           Your next website, <span className="text-highlight">already built.</span>
         </h1>
@@ -62,6 +65,13 @@ function Home() {
       </section>
 
       <section aria-label="Websites for sale">
+        {isEmpty ? (
+          <div className="border-t border-border py-12 text-center sm:py-16">
+            <Package className="mx-auto size-8 text-highlight" />
+            <h2 className="mt-4 text-2xl font-semibold">New websites coming soon.</h2>
+            <p className="mt-3 text-muted-foreground">Fresh designs are on the way. Check back soon.</p>
+          </div>
+        ) : <>
         <div className="border-b border-border pb-5">
           <div className="relative mb-4 max-w-lg">
             <Search className="pointer-events-none absolute left-3 top-3 size-5 text-muted-foreground" />
@@ -112,6 +122,7 @@ function Home() {
             ))}
           </div>
         )}
+        </>}
       </section>
     </div>
   );

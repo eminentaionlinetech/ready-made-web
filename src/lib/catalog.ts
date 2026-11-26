@@ -68,3 +68,8 @@ export function browseWebsites<T extends Searchable>(
 ): T[] {
   return searchWebsites(filterByCategory(websites, category), q);
 }
+
+/** Catalog availability comes only from the rows returned by the database. */
+export function catalogAvailability(websites: readonly unknown[]) {
+  return { count: websites.length, showBadge: websites.length > 0, isEmpty: websites.length === 0 };
+}

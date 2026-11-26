@@ -10,6 +10,8 @@
 - [x] Private admin page: only the owner (admin role) can add/edit listings with screenshots and a zip file
 - [x] Buyer dashboard Download button: 10-minute links, paid purchases only
 - [ ] Register the live-site Paystack webhook once the app is published (waiting on publish)
-- [ ] Real listings and live demo links (waiting on user; samples use example.com demos)
-- [ ] Shop polish: search + category filters, loading states, mobile layouts, thank-you page
-- [ ] Recheck paid-only dashboard downloads and 10-minute signed links
+- [ ] Upload real listings (waiting on owner’s website files and screenshots)
+- [x] Shop polish: search + category filters, loading states, mobile layouts, thank-you page
+- [x] Recheck paid-only dashboard downloads and 10-minute signed links
+- [x] Remove live sample listings and fake media; show only admin uploads, a coming-soon empty state, and a real-count badge hidden at zero
+- [ ] Remove original sample literals from historical setup migration (blocked: migration history is protected and cannot be edited)

@@ -11,7 +11,7 @@ describe("website downloads", () => {
     expect(canDownload(null)).toBe(false);
   });
   it("names the saved file after the website", () => {
-    expect(downloadFileName("northwind")).toBe("northwind.zip");
+    expect(downloadFileName("test-website")).toBe("test-website.zip");
     expect(downloadFileName(null)).toBe("website.zip");
   });
 });

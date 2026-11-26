@@ -37,7 +37,7 @@ describe("payment references", () => {
 
 describe("thank-you callback", () => {
   it("returns to the thank-you page with the purchased slug", () => {
-    expect(thankYouUrl(PUBLISHED_URL, "northwind")).toBe(`${PUBLISHED_URL}/thank-you?checkout=northwind`);
+    expect(thankYouUrl(PUBLISHED_URL, "test-website")).toBe(`${PUBLISHED_URL}/thank-you?checkout=test-website`);
   });
   it("keeps the callback on the shop and safely encodes the slug", () => {
     expect(thankYouUrl("https://evil.example", "a&reference=fake")).toBe(`${PUBLISHED_URL}/thank-you?checkout=a%26reference%3Dfake`);

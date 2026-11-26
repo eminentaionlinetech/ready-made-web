@@ -399,7 +399,7 @@ function ListingForm({
             setTitle(e.target.value);
             if (!slugTouched) setSlug(slugify(e.target.value));
           }}
-          placeholder="Northwind"
+          placeholder="Website title"
         />
       </Field>
 
@@ -413,7 +413,7 @@ function ListingForm({
             setSlug(e.target.value);
           }}
           onBlur={() => setSlug(slugify(slug))}
-          placeholder="northwind"
+          placeholder="website-address"
         />
       </Field>
 
@@ -439,7 +439,7 @@ function ListingForm({
             inputMode="decimal"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            placeholder="129000"
+            placeholder="Price in naira"
           />
         </Field>
       </div>
@@ -450,7 +450,7 @@ function ListingForm({
           type="url"
           value={demoUrl}
           onChange={(e) => setDemoUrl(e.target.value)}
-          placeholder="https://northwind-demo.com"
+          placeholder="Live demo URL"
         />
       </Field>
 

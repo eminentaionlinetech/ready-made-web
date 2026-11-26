@@ -40,3 +40,4 @@ use the editor.
 - Buyer zip downloads go through `getDownloadLink` in `src/lib/downloads.functions.ts`: it checks the paid purchase as the buyer, reads `file_path` with the service role, then signs the link as the buyer (storage RLS re-checks); link lifetime lives in `src/lib/downloads.ts`. Why: file paths stay hidden and nobody can sign a file they didn't buy.
 - Checkout returns to the authenticated thank-you route, which confirms the buyer's reference on the server before showing success or a download; legacy dashboard callbacks forward there so existing checkouts still work.
 - Reuse the secure DownloadButton on the dashboard and purchase confirmation; it requests a fresh signed link from getDownloadLink on each click.
+- Derive catalog availability and badge counts from database rows; never supply fallback listings, so admin uploads remain the only live shop content.

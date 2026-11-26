@@ -8,7 +8,7 @@ export function canDownload(purchase: { status: string } | null | undefined): bo
   return purchase?.status === "paid";
 }
 
-/** Friendly name for the saved file, e.g. "northwind.zip". */
+/** Friendly name for the saved file, e.g. "test-website.zip". */
 export function downloadFileName(slug: string | null | undefined): string {
   const base = (slug ?? "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "");
   return `${base || "website"}.zip`;
