@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import logoMark from "@/assets/readymade-mark.png.asset.json";
 import { useAuth } from "@/lib/auth";
 import { avatarUrlQuery, isAdminQuery, profileQuery } from "@/lib/queries";
 
@@ -32,9 +33,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
         <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground">
-            <span className="size-2.5 rounded-sm bg-highlight" />
-          </span>
+          <img src={logoMark.url} alt="" className="size-8" width={32} height={32} />
           <span className="font-display text-lg font-semibold tracking-tight">Readymade</span>
         </Link>
         <nav className="flex items-center gap-1">
@@ -97,7 +96,8 @@ export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-        <span>
+        <span className="flex items-center gap-2">
+          <img src={logoMark.url} alt="" className="size-6" width={24} height={24} />
           <span className="font-display font-semibold text-foreground">Readymade</span> — websites
           ready to launch.
         </span>
