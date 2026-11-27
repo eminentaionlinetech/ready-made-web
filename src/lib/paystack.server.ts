@@ -46,7 +46,7 @@ export async function paystack(path: string, init: { method?: string; body?: unk
 export async function confirmPayment(reference: string): Promise<{ paid: boolean }> {
   const { data: purchase, error } = await supabaseAdmin
     .from("purchases")
-    .select("id, status, amount_cents, currency")
+    .select("id, status, amount_cents, currency, website:websites(price_cents)")
     .eq("paystack_reference", reference)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -60,6 +60,8 @@ export async function confirmPayment(reference: string): Promise<{ paid: boolean
     if (err instanceof PaystackError && err.status === 400) return { paid: false };
     throw err;
   }
+  // Must match both what was charged and the listing's current price, in naira.
+  if (purchase.website?.price_cents !== purchase.amount_cents) return { paid: false };
   if (!isPaidTransaction(tx, purchase)) return { paid: false };
 
   const now = new Date().toISOString();
