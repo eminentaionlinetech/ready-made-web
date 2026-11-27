@@ -43,6 +43,13 @@
       "when": 1795457506031,
       "tag": "0005_admin_role_and_listing_management",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795751052733,
+      "tag": "0006_lock_purchases_writes",
+      "breakpoints": true
     }
   ]
 }
